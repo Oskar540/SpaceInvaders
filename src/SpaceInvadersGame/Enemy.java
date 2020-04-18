@@ -20,14 +20,8 @@ public class Enemy extends Spaceship {
         g.fillRect(posX, posY, width, height);
     }
 
-    void shootingController(){
-        new Thread(()->{
-            while(true){
-                //System.out.println("Player:" + Player.posX);
-                if(Math.abs(this.posX - 5) <= Player.posX){
-                    System.out.println("Alien: " + this.posX);
-                }
-            }
-        }).start();
+    void paint(Graphics2D g, Color color) {
+        g.setColor(color);
+        g.fillRect(posX, posY, width, height);
     }
 }

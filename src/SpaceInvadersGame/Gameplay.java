@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Gameplay extends JPanel implements KeyListener, ActionListener {
-    private boolean play = false;
+    public static boolean play = false;
     private int score = 0;
     private int row;
     private int col;
@@ -25,7 +25,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private ArrayList<Missile> missiles;
     public int screenWidth;
     public int screenHeight;
-    private boolean isMovingThreadPlayed;
 
     public Gameplay(int width, int height){
         enemies = new MapGenerator(5, 11, width, height);
@@ -41,7 +40,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         screenHeight = height;
         player = new Player(width/2 - 25, 550, 50, 20, 20, 5);
         missiles = new ArrayList<>();
-        isMovingThreadPlayed = false;
+        enemies.enemiesMovement();
+        //shootingalinefeature
     }
 
     public void paint(Graphics g){
@@ -144,12 +144,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     }
 
     public void moveRight(){
-        if(!play) enemies.enemiesMovement();
         play = true;
         player.posX += player.movementSpeed;
     }
     public void moveLeft(){
-        if(!play) enemiesMovement();
         play = true;
         player.posX -= player.movementSpeed;
     }
@@ -162,22 +160,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         g.setFont(new Font("serif", Font.BOLD, 20));
         g.drawString("Press Enter to restart", 230, 350);
         missiles.clear();
-    }
-    public void enemiesMovement(){
-        new Thread(()->{
-                while(true) {
-                    try {
-                        Thread.sleep(500);
-                        enemies.parentPosX += enemies.globalMovementSpeed;
-                        if((enemies.parentPosX <= 10) && (enemies.globalMovementSpeed < 0)){
-                            enemies.globalMovementSpeed *= -1;
-                        }
-                        if(enemies.parentPosX + enemies.enemyWidth*enemies.map[0].length + enemies.gap*(enemies.map[0].length - 1) + 30>= screenWidth && (enemies.globalMovementSpeed > 0)){
-                            enemies.globalMovementSpeed *= -1;
-                        }
-                    } catch (InterruptedException e) {e.printStackTrace();}
-                }
-        }).start();
     }
 
     @Override
