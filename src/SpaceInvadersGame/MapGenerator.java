@@ -69,11 +69,20 @@ public class MapGenerator {
         }).start();
     }
     public void enemiesShooting(){
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
+        new Thread(()->{
+            while(true){
+                if(Gameplay.play){
+                    for (int i = 0; i < map.length; i++) {
+                        for (int j = 0; j < map[i].length; j++) {
+                            if(canShoot(i, j) && Math.abs(map[i][j].posX - 5) == Player.posX && Math.random() < 0.5){
 
+                            }
+                        }
+                    }
+                }
             }
-        }
+        }).start();
+
     }
     private boolean canShoot(int row, int col){
         if(row == map.length) return true;

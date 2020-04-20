@@ -138,8 +138,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 repaint();
             }
         }
-        if(e.getKeyCode() == KeyEvent.VK_SPACE && play){
-            missiles.add(new Missile(player.posX + player.width/2 - Missile.globalWidth/2, player.posY, 5, -1, player));
+        if(e.getKeyCode() == KeyEvent.VK_SPACE){
+            if(play){
+                missiles.add(new Missile(player.posX + player.width/2 - Missile.globalWidth/2, player.posY, 5, -1, player));
+            }
         }
     }
 
