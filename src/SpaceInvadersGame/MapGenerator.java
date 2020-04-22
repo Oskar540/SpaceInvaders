@@ -51,7 +51,8 @@ public class MapGenerator {
     public void enemiesMovement(){
         new Thread(()->{
             while(true) {
-                System.out.println(Gameplay.play); //wyswietlanie statusu play powoduje ze watek dziala wtf
+                try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+                //System.out.println(Gameplay.play); //wyswietlanie statusu play powoduje ze watek dziala wtf
                 if(Gameplay.play){
                     try {
                         Thread.sleep(500);
@@ -64,7 +65,6 @@ public class MapGenerator {
                         }
                     } catch (InterruptedException e) {e.printStackTrace();}
                 }
-
             }
         }).start();
     }
