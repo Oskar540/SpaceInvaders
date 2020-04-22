@@ -71,9 +71,8 @@ public class MapGenerator {
     private void enemiesShooting(){
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                if(canShoot(i, j) && Math.abs(map[i][j].posX - 5) == Player.posX && Math.random() < 0.5){
-                    //Gameplay.missiles.add(new Missile(map[i][j].posX + map[i][j].width/2 - Missile.globalWidth/2, map[i][j].posY, 5, 1, map[i][j]));
-                    System.out.println("shoot");
+                if(canShoot(i, j) && map[i][j].isAlive && map[i][j].posX <= Player.posX + 10 && map[i][j].posX >= Player.posX - 10){
+                    Gameplay.missiles.add(new Missile(map[i][j].posX + map[i][j].width/2 - Missile.globalWidth/2, map[i][j].posY, 5, 1, map[i][j]));
                 }
             }
         }

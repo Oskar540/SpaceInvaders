@@ -25,6 +25,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public static ArrayList<Missile> missiles;
     public int screenWidth;
     public int screenHeight;
+
     public Gameplay(int width, int height){
         enemies = new MapGenerator(5, 11, width, height);
         row = enemies.map.length;
@@ -63,6 +64,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
         //player
         player.paint((Graphics2D) g);
+        if(!player.isAlive) gameOver(g, false);
 
         if(totalEnemies <= 0) gameOver(g, true);
 
@@ -92,15 +94,25 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                                     enemies.map[ai.get()][aj.get()].width,
                                     enemies.map[ai.get()][aj.get()].height).
                                     intersects(m.posX, m.posY, m.width, m.height)
-                                    && enemies.map[ai.get()][aj.get()].isAlive){
+                                    && enemies.map[ai.get()][aj.get()].isAlive && m.shooter instanceof Player){
                         enemies.map[ai.get()][aj.get()].isAlive = false;
                         totalEnemies--;
                         missiles.set(missiles.indexOf(m), null);
                     }
                 });
-
             }
         }
+        missiles.forEach((m) ->{
+            if(m != null)
+                if(new Rectangle(player.posX,
+                        player.posY,
+                        player.width,
+                        player.height).
+                        intersects(m.posX, m.posY, m.width, m.height)
+                        && player.isAlive && m.shooter instanceof Enemy){
+                    player.isAlive = false;
+                }
+        });
     }
     public void moveRight(){
         play = true;
@@ -152,6 +164,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             if(!play){
                 play = true;
+                player.isAlive = true;
                 player.posX = 310;
                 score = 0;
                 enemies = new MapGenerator(row, col, this.screenWidth, this.screenHeight);

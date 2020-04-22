@@ -10,6 +10,7 @@ public class Missile {
     int speed;
     int directY;
     boolean isAlive;
+    Spaceship shooter;
     static int globalWidth = 10;
 
     public Missile(int posX, int posY, int speed, int directY, Spaceship shooter) {
@@ -20,6 +21,7 @@ public class Missile {
         this.speed = speed;
         this.directY = directY;
         isAlive = true;
+        this.shooter = shooter;
     }
 
     synchronized void paint(Graphics2D g){

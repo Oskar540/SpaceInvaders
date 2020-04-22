@@ -16,8 +16,10 @@ public class Player extends Spaceship {
 
     @Override
     void paint(Graphics2D g) {
-        g.setColor(Color.white);
-        g.fillRect(posX, posY, width, height);
-        g.fillRect(posX + width/2 - width/4/2, posY - height/4, width/4, height/4);
+        if(this.isAlive){
+            g.setColor(Color.white);
+            g.fillRect(posX, posY, width, height);
+            g.fillRect(posX + width/2 - width/4/2, posY - height/4, width/4, height/4);
+        }
     }
 }
