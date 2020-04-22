@@ -22,10 +22,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     public MapGenerator enemies;
     private Player player;
-    private ArrayList<Missile> missiles;
+    public static ArrayList<Missile> missiles;
     public int screenWidth;
     public int screenHeight;
-
     public Gameplay(int width, int height){
         enemies = new MapGenerator(5, 11, width, height);
         row = enemies.map.length;
@@ -40,10 +39,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         screenHeight = height;
         player = new Player(width/2 - 25, 550, 50, 20, 20, 5);
         missiles = new ArrayList<>();
-        enemies.enemiesMovement();
-        //shootingalinefeature
+        enemies.enemiesBehaviour();
     }
-
     public void paint(Graphics g){
         //background
         g.setColor(Color.black);
@@ -71,41 +68,65 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
         g.dispose();
     }
+    private void missilesBehaviour() {
+        for (int i = 0; i < missiles.size(); i++) {
+            if(missiles.get(i) != null) {
+                missiles.get(i).posY += missiles.get(i).speed*missiles.get(i).directY;
+                //System.out.println("Position: " + missiles.get(i).posY);
+                if(missiles.get(i).posY > 600 || missiles.get(i).posY <= 0){
+                    missiles.set(i, null);
+                    //System.out.println("Bullet " + i + " poofed..");
+                }
+            }
+        } //missiles behaviour
+    }
+    private void enemiesMissilesDependencies() {
+        for (int i = 0; i < enemies.map.length; i++) {
+            for (int j = 0; j < enemies.map[i].length; j++) {
+                AtomicInteger ai = new AtomicInteger(i);
+                AtomicInteger aj = new AtomicInteger(j);
+                missiles.forEach((m) ->{
+                    if(m != null)
+                    if(new Rectangle(enemies.map[ai.get()][aj.get()].posX,
+                                    enemies.map[ai.get()][aj.get()].posY,
+                                    enemies.map[ai.get()][aj.get()].width,
+                                    enemies.map[ai.get()][aj.get()].height).
+                                    intersects(m.posX, m.posY, m.width, m.height)
+                                    && enemies.map[ai.get()][aj.get()].isAlive){
+                        enemies.map[ai.get()][aj.get()].isAlive = false;
+                        totalEnemies--;
+                        missiles.set(missiles.indexOf(m), null);
+                    }
+                });
+
+            }
+        }
+    }
+    public void moveRight(){
+        play = true;
+        player.posX += player.movementSpeed;
+    }
+    public void moveLeft(){
+        play = true;
+        player.posX -= player.movementSpeed;
+    }
+    private void gameOver(Graphics g, boolean isWon){
+        play = false;
+        g.setColor(Color.red);
+        g.setFont(new Font("serif", Font.BOLD, 30));
+        if(isWon) g.drawString("You won! Scores: "+ score, 260, 300);
+        else g.drawString("Game Over! Scores: "+ score, 190, 300);
+        g.setFont(new Font("serif", Font.BOLD, 20));
+        g.drawString("Press Enter to restart", 230, 350);
+        missiles.clear();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         timer.start();
         if(play){
-            for (int i = 0; i < enemies.map.length; i++) {
-                for (int j = 0; j < enemies.map[i].length; j++) {
-                    AtomicInteger ai = new AtomicInteger(i);
-                    AtomicInteger aj = new AtomicInteger(j);
-                    missiles.forEach((m) ->{
-                        if(m != null)
-                        if(new Rectangle(enemies.map[ai.get()][aj.get()].posX,
-                                        enemies.map[ai.get()][aj.get()].posY,
-                                        enemies.map[ai.get()][aj.get()].width,
-                                        enemies.map[ai.get()][aj.get()].height).
-                                        intersects(m.posX, m.posY, m.width, m.height)
-                                        && enemies.map[ai.get()][aj.get()].isAlive){
-                            enemies.map[ai.get()][aj.get()].isAlive = false;
-                            totalEnemies--;
-                            missiles.set(missiles.indexOf(m), null);
-                        }
-                    });
-
-                }
-            } //enemies <-> missiles dependencies
-            for (int i = 0; i < missiles.size(); i++) {
-                if(missiles.get(i) != null) {
-                    missiles.get(i).posY += missiles.get(i).speed*missiles.get(i).directY;
-                    System.out.println("Position: " + missiles.get(i).posY);
-                    if(missiles.get(i).posY > 600 || missiles.get(i).posY <= 0){
-                        missiles.set(i, null);
-                        System.out.println("Bullet " + i + " poofed..");
-                    }
-                }
-            } //missiles behaviour
+            enemiesMissilesDependencies();
+            missilesBehaviour();
         }
         repaint();
     }
@@ -144,26 +165,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
         }
     }
-
-    public void moveRight(){
-        play = true;
-        player.posX += player.movementSpeed;
-    }
-    public void moveLeft(){
-        play = true;
-        player.posX -= player.movementSpeed;
-    }
-    private void gameOver(Graphics g, boolean isWon){
-        play = false;
-        g.setColor(Color.red);
-        g.setFont(new Font("serif", Font.BOLD, 30));
-        if(isWon) g.drawString("You won! Scores: "+ score, 260, 300);
-        else g.drawString("Game Over! Scores: "+ score, 190, 300);
-        g.setFont(new Font("serif", Font.BOLD, 20));
-        g.drawString("Press Enter to restart", 230, 350);
-        missiles.clear();
-    }
-
     @Override
     public void keyTyped(KeyEvent e) {}
     @Override

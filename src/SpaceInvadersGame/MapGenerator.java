@@ -48,41 +48,35 @@ public class MapGenerator {
             }
         }
     }
-    public void enemiesMovement(){
+    public void enemiesBehaviour(){
         new Thread(()->{
-            while(true) {
+            while(true){
                 try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
-                //System.out.println(Gameplay.play); //wyswietlanie statusu play powoduje ze watek dziala wtf
                 if(Gameplay.play){
-                    try {
-                        Thread.sleep(500);
-                        this.parentPosX += this.globalMovementSpeed;
-                        if((this.parentPosX <= 10) && (this.globalMovementSpeed < 0)){
-                            this.globalMovementSpeed *= -1;
-                        }
-                        if(this.parentPosX + this.enemyWidth*this.map[0].length + this.gap*(this.map[0].length - 1) + 30>= screenWidth && (this.globalMovementSpeed > 0)){
-                            this.globalMovementSpeed *= -1;
-                        }
-                    } catch (InterruptedException e) {e.printStackTrace();}
+                    enemiesMovement();
+                    enemiesShooting();
                 }
             }
         }).start();
     }
-    public void enemiesShooting(){
-        new Thread(()->{
-            while(true){
-                if(Gameplay.play){
-                    for (int i = 0; i < map.length; i++) {
-                        for (int j = 0; j < map[i].length; j++) {
-                            if(canShoot(i, j) && Math.abs(map[i][j].posX - 5) == Player.posX && Math.random() < 0.5){
-
-                            }
-                        }
-                    }
+    private void enemiesMovement(){
+        this.parentPosX += this.globalMovementSpeed;
+        if((this.parentPosX <= 10) && (this.globalMovementSpeed < 0)){
+            this.globalMovementSpeed *= -1;
+        }
+        if(this.parentPosX + this.enemyWidth*this.map[0].length + this.gap*(this.map[0].length - 1) + 30>= screenWidth && (this.globalMovementSpeed > 0)){
+            this.globalMovementSpeed *= -1;
+        }
+    }
+    private void enemiesShooting(){
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[i].length; j++) {
+                if(canShoot(i, j) && Math.abs(map[i][j].posX - 5) == Player.posX && Math.random() < 0.5){
+                    //Gameplay.missiles.add(new Missile(map[i][j].posX + map[i][j].width/2 - Missile.globalWidth/2, map[i][j].posY, 5, 1, map[i][j]));
+                    System.out.println("shoot");
                 }
             }
-        }).start();
-
+        }
     }
     private boolean canShoot(int row, int col){
         if(row == map.length) return true;
