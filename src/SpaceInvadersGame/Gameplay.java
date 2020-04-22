@@ -1,11 +1,15 @@
 package SpaceInvadersGame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,10 +56,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         //enemies
         enemies.draw((Graphics2D)g);
 
-        //scores
+        //scores / hp
         g.setColor(Color.white);
         g.setFont(new Font("serif", Font.BOLD, 25));
-        g.drawString("Score: " + score, 590, 30);
+        g.drawString("Health points: " + player.hp, 490, 30);
 
         //missiles
         missiles.forEach((m) -> {
@@ -85,32 +89,28 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private void enemiesMissilesDependencies() {
         for (int i = 0; i < enemies.map.length; i++) {
             for (int j = 0; j < enemies.map[i].length; j++) {
-                AtomicInteger ai = new AtomicInteger(i);
-                AtomicInteger aj = new AtomicInteger(j);
-                missiles.forEach((m) ->{
-                    if(m != null)
-                    if(new Rectangle(enemies.map[ai.get()][aj.get()].posX,
-                                    enemies.map[ai.get()][aj.get()].posY,
-                                    enemies.map[ai.get()][aj.get()].width,
-                                    enemies.map[ai.get()][aj.get()].height).
-                                    intersects(m.posX, m.posY, m.width, m.height)
-                                    && enemies.map[ai.get()][aj.get()].isAlive && m.shooter instanceof Player){
-                        enemies.map[ai.get()][aj.get()].isAlive = false;
-                        totalEnemies--;
-                        missiles.set(missiles.indexOf(m), null);
-                    }
-                });
+
+                for (int k = 0; k < missiles.size(); k++) {
+                    if(missiles.get(k) != null)
+                        if(new Rectangle(enemies.map[i][j].posX, enemies.map[i][j].posY, enemies.map[i][j].width, enemies.map[i][j].height).
+                                intersects(missiles.get(k).posX, missiles.get(k).posY, missiles.get(k).width, missiles.get(k).height)
+                                && enemies.map[i][j].isAlive && missiles.get(k).shooter instanceof Player)
+                        {
+                            missiles.set(k, null);
+                            enemies.map[i][j].isAlive = false;
+                            totalEnemies--;
+                        }
+                }
             }
         }
         missiles.forEach((m) ->{
             if(m != null)
-                if(new Rectangle(player.posX,
-                        player.posY,
-                        player.width,
-                        player.height).
-                        intersects(m.posX, m.posY, m.width, m.height)
-                        && player.isAlive && m.shooter instanceof Enemy){
-                    player.isAlive = false;
+                if(new Rectangle(player.posX, player.posY, player.width, player.height).
+                        intersects(m.posX, m.posY, m.width, m.height) && player.isAlive && m.shooter instanceof Enemy){
+                    missiles.set(missiles.indexOf(m), null);
+                    player.hp--;
+                    System.out.println(player.hp);
+                    if(player.hp <= 0) player.isAlive = false;
                 }
         });
     }
@@ -123,6 +123,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         player.posX -= player.movementSpeed;
     }
     private void gameOver(Graphics g, boolean isWon){
+        Thread.interrupted();
         play = false;
         g.setColor(Color.red);
         g.setFont(new Font("serif", Font.BOLD, 30));
@@ -142,7 +143,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         }
         repaint();
     }
-
     @Override
     public void keyPressed(KeyEvent e) {
         if(e.getKeyCode() == KeyEvent.VK_RIGHT){
@@ -163,12 +163,19 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         }
         if(e.getKeyCode() == KeyEvent.VK_ENTER){
             if(!play){
+                for (int i = 0; i < enemies.map.length; i++) {
+                    for (int j = 0; j < enemies.map[i].length; j++) {
+                        enemies.map[i][j].isAlive = false;
+                    }
+                }
                 play = true;
                 player.isAlive = true;
                 player.posX = 310;
                 score = 0;
                 enemies = new MapGenerator(row, col, this.screenWidth, this.screenHeight);
                 totalEnemies = enemies.map.length * enemies.map[0].length;
+                player = new Player(screenWidth/2 - 25, 550, 50, 20, 20, 5);
+                enemies.enemiesBehaviour();
                 repaint();
             }
         }
@@ -178,6 +185,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
         }
     }
+
+
     @Override
     public void keyTyped(KeyEvent e) {}
     @Override

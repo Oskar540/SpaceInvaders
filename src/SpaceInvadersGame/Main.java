@@ -8,7 +8,8 @@ public class Main {
         Gameplay gameplay = new Gameplay(700, 600);
         frame.setBounds(10, 10, 700, 600);
         frame.setTitle("SpaceInvaders Game");
-        frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(true);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(gameplay);
