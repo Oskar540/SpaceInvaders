@@ -13,10 +13,13 @@ public class Player extends Spaceship {
     public Player(int posX, int posY, int width, int height, int movementSpeed, int hp) {
         super(posX, posY, width, height, movementSpeed, hp);
         Player.posX = posX;
-
+        try {
+            playerImg = ImageIO.read(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\player.png"));
+            playerImg = playerImg.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+        } catch (IOException e) {}
     }
     public Player() {
-        super(150, 50, 50, 20, 20, 5);
+        super(150, 550, 50, 20, 20, 5);
         Player.posX = this.posX;
     }
 
@@ -26,9 +29,9 @@ public class Player extends Spaceship {
 
         if(this.isAlive){
             g.drawImage(playerImg, posX, posY, null);
-            g.setColor(Color.white);
-            g.fillRect(posX, posY, width, height);
-            g.fillRect(posX + width/2 - width/4/2, posY - height/4, width/4, height/4);
+            //g.setColor(Color.white);
+            //g.fillRect(posX, posY, width, height);
+            //g.fillRect(posX + width/2 - width/4/2, posY - height/4, width/4, height/4);
         }
     }
 }

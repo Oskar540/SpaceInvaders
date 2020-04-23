@@ -42,7 +42,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         timer.start();
         screenWidth = width;
         screenHeight = height;
-        player = new Player(width/2 - 25, 550, 50, 20, 20, 5);
+        player = new Player(width/2 - 25, 500, 50, 20, 20, 5);
         missiles = new ArrayList<>();
         enemies.enemiesBehaviour();
     }
