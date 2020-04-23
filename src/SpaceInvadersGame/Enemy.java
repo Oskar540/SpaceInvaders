@@ -7,11 +7,15 @@ import java.io.IOException;
 
 public class Enemy extends Spaceship {
     public Image enemyImg;
+    public Image enemyImgRed;
+
     public Enemy(int posX, int posY, int width, int height, int movementSpeed, int hp) {
         super(posX, posY, width, height, movementSpeed, hp);
         try {
             enemyImg = ImageIO.read(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\alien.png"));
+            enemyImgRed = ImageIO.read(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\alien-red.png"));
             enemyImg = enemyImg.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+            enemyImgRed = enemyImgRed.getScaledInstance(width, height, Image.SCALE_DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -23,7 +27,9 @@ public class Enemy extends Spaceship {
         super(11, 0, 33, 24, 10, 1);
         try {
             enemyImg = ImageIO.read(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\alien.png"));
+            enemyImgRed = ImageIO.read(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\alien-red.png"));
             enemyImg = enemyImg.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+            enemyImgRed = enemyImgRed.getScaledInstance(width, height, Image.SCALE_DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,6 +41,6 @@ public class Enemy extends Spaceship {
     }
 
     void paint(Graphics2D g, Color color) {
-        g.drawImage(enemyImg, posX, posY, null);
+        g.drawImage(enemyImgRed, posX, posY, null);
     }
 }

@@ -78,10 +78,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         for (int i = 0; i < missiles.size(); i++) {
             if(missiles.get(i) != null) {
                 missiles.get(i).posY += missiles.get(i).speed*missiles.get(i).directY;
-                //System.out.println("Position: " + missiles.get(i).posY);
                 if(missiles.get(i).posY > 600 || missiles.get(i).posY <= 0){
                     missiles.set(i, null);
-                    //System.out.println("Bullet " + i + " poofed..");
                 }
             }
         } //missiles behaviour
@@ -109,7 +107,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                         intersects(m.posX, m.posY, m.width, m.height) && player.isAlive && m.shooter instanceof Enemy){
                     missiles.set(missiles.indexOf(m), null);
                     player.hp--;
-                    System.out.println(player.hp);
+                    //System.out.println(player.hp);
                     if(player.hp <= 0) player.isAlive = false;
                 }
         });

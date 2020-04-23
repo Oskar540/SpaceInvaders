@@ -52,7 +52,7 @@ public class MapGenerator {
         new Thread(()->{
             while(true){
                 try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
-                System.out.println(Gameplay.play);
+                //System.out.println(Gameplay.play);
                 if(Gameplay.play){
                     enemiesMovement();
                     enemiesShooting();
@@ -80,9 +80,7 @@ public class MapGenerator {
     }
     private boolean canShoot(int row, int col){
         if(row == map.length) return true;
-        for(int i = row + 1; i < map.length;i++){
-            if(map[i][col].isAlive) return false;
-        }
+        for(int i = row + 1; i < map.length;i++) if(map[i][col].isAlive) return false;
         return true;
     }
 }
