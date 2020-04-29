@@ -1,5 +1,7 @@
 package SpaceInvadersGame;
 
+import org.w3c.dom.ls.LSOutput;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,9 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public static boolean play = false;
@@ -18,8 +20,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public int menuFrames = 1;
     private int timeMinutes = 0;
     private int timeSeconds = 0;
+    private String bestMinutes;
+    private int bestSeconds;
     private int row;
     private int col;
+
+    private FileReader fr;
 
     private int totalEnemies;
 
@@ -34,8 +40,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     public Gameplay(int width, int height){
         stars = new Rectangle[20];
-        floatingStars();
-        //floatingTime();
         new Thread(()->{while(onMenu){
             menuFrames = menuFrames > 2 ? 1 : menuFrames + 1;
             try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
@@ -45,6 +49,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("abduction2002.ttf")));
         } catch (IOException|FontFormatException e) { }
         enemies = new MapGenerator(5, 11, width, height);
+        screenWidth = width;
+        screenHeight = height;
+        floatingStars();
         row = enemies.map.length;
         col = enemies.map[0].length;
         totalEnemies = row * col;
@@ -53,21 +60,21 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         setFocusTraversalKeysEnabled(false);
         timer = new Timer(delay, this);
         timer.start();
-        screenWidth = width;
-        screenHeight = height;
         player = new Player(width/2 - 25, 500, 50, 20, 20, 5);
         missiles = new ArrayList<>();
-        enemies.enemiesBehaviour();
+        //Scanner sc = new Scanner(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\highscore.txt"));
+        //bestMinutes = sc.next();
+        //System.out.println(bestMinutes);
     }
     public void paint(Graphics g){
         //background
         g.setColor(Color.black);
         g.fillRect(0, 0, 700, 600);
-
+        g.setColor(Color.white);
         for (int i = 0; i < stars.length; i++) {
-            g.setColor(Color.white);
             g.drawRect((int)stars[i].getX(), (int)stars[i].getY(), (int)stars[i].getWidth(), (int)stars[i].getHeight());
         }
+
         if(!onMenu) {
             //enemies
             enemies.draw((Graphics2D) g);
@@ -121,7 +128,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private void enemiesMissilesDependencies() {
         for (int i = 0; i < enemies.map.length; i++) {
             for (int j = 0; j < enemies.map[i].length; j++) {
-
                 for (int k = 0; k < missiles.size(); k++) {
                     if(missiles.get(k) != null)
                         if(new Rectangle(enemies.map[i][j].posX, enemies.map[i][j].posY, enemies.map[i][j].width, enemies.map[i][j].height).
@@ -199,23 +205,23 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (!play && !onMenu) {
+            if (!play) {
                 for (int i = 0; i < enemies.map.length; i++) {
                     for (int j = 0; j < enemies.map[i].length; j++) {
                         enemies.map[i][j].isAlive = false;
                     }
                 }
-                play = true;
                 player.isAlive = true;
                 player.posX = 310;
                 timeSeconds = 0;
+                timeMinutes = 0;
                 enemies = new MapGenerator(row, col, this.screenWidth, this.screenHeight);
                 totalEnemies = enemies.map.length * enemies.map[0].length;
                 player = new Player(screenWidth / 2 - 25, 500, 50, 20, 20, 5);
                 enemies.enemiesBehaviour();
                 repaint();
             }
-            else if(onMenu) onMenu = false;
+            onMenu = false;
         }
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             System.exit(0);
@@ -229,6 +235,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         if(!onMenu) {
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                 if(!play) floatingTime();
+                play = true;
                 if (player.posX <= 10) {
                     player.posX = 10;
                 } else {
@@ -237,6 +244,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
             if(e.getKeyCode() == KeyEvent.VK_RIGHT){
                 if(!play) floatingTime();
+                play = true;
                 if(player.posX >= screenWidth - player.width - 20){
                     player.posX = screenWidth - player.width - 20;
                 }
@@ -254,27 +262,28 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     private void floatingStars(){
         new Thread(()->{
+            for (int i = 0; i < stars.length; i++) {
+                stars[i] = new Rectangle((int) (Math.random() * screenWidth), (int) (Math.random() * screenHeight), 2, 2);
+            }
             while(true) {
                 for (int i = 0; i < stars.length; i++) {
-                    stars[i] = new Rectangle((int) (Math.random() * getWidth()), (int) (Math.random() * getHeight()), 2, 2);
+                    if(stars[i] != null){
+                        stars[i].setRect(stars[i].getX(), stars[i].getY() + 1*i/7 + 1, stars[i].getWidth(), stars[i].getHeight());
+                        if(stars[i].getY() >= screenHeight) stars[i] = new Rectangle((int) (Math.random() * getWidth()),0, 2, 2);
+                    }
                 }
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(5);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-//            while(true){
-//                for (int i = 0; i < stars.length; i++) {
-//                    stars[i].getY() = stars[i].getY() + 1;
-//                }
-//            }
         }).start();
     }
     private void floatingTime(){
         new Thread(()-> {
             try {Thread.sleep(100);} catch (InterruptedException ex) {System.out.println("Nie spij");}
-            System.out.println(play);
+            //System.out.println(play);
             while(play){
                 try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
                 if(timeSeconds >= 59){
