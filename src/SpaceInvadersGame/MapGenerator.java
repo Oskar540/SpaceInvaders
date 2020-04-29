@@ -67,6 +67,7 @@ public class MapGenerator {
             this.globalMovementSpeed *= -1;
         }
         if(this.parentPosX + this.enemyWidth*this.map[0].length + this.gap*(this.map[0].length - 1) + 30>= screenWidth && (this.globalMovementSpeed > 0)){
+            this.parentPoxY += map[0][0].height + gap;
             this.globalMovementSpeed *= -1;
         }
     }

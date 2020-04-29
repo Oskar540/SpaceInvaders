@@ -1,6 +1,5 @@
 package SpaceInvadersGame;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,18 +7,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public static boolean play = false;
     public static boolean onMenu = true;
     private Rectangle2D[] stars;
     public int menuFrames = 1;
-    private int score = 0;
+    private int timeMinutes = 0;
+    private int timeSeconds = 0;
     private int row;
     private int col;
 
@@ -41,6 +39,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             menuFrames = menuFrames > 2 ? 1 : menuFrames + 1;
             try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
         }}).start();
+        try {
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("abduction2002.ttf")));
+        } catch (IOException|FontFormatException e) {
+            System.out.println("Cant make new font :(");
+        }
         enemies = new MapGenerator(5, 11, width, height);
         row = enemies.map.length;
         col = enemies.map[0].length;
@@ -92,7 +96,14 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 g.fillRoundRect(x, x, getWidth() - sc, getHeight() - sc, 20, 20);
             }
             g.setColor(Color.white);
-            g.drawString("PJATK SPACE INVADERS", 300, 200);
+            g.setFont(new Font("abduction2002", Font.PLAIN, 160));
+            g.drawString("PJATK", 90, 220);
+            g.setFont(new Font("abduction2002", Font.PLAIN, 60));
+            g.drawString("SPACE INVADERS", 80, 300);
+            g.setFont(new Font("abduction2002", Font.PLAIN, 20));
+            g.drawString("Press 'ENTER' to PLAY", 210, 350);
+            g.setFont(new Font("abduction2002", Font.PLAIN, 16));
+            g.drawString("Press 'ESC' to QUIT", 250, 480);
         }
         g.dispose();
     }
@@ -145,12 +156,31 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private void gameOver(Graphics g, boolean isWon){
         Thread.interrupted();
         play = false;
+        for (int i = 0, x = 75, sc = 130, c = -1; i < 4; i++, x+=5, sc += 10, c*=-1) {
+            g.setColor(new Color(c));
+            g.fillRoundRect(x, x, getWidth() - sc, getHeight() -100 - sc, 20, 20);
+        }
+
         g.setColor(Color.red);
-        g.setFont(new Font("serif", Font.BOLD, 30));
-        if(isWon) g.drawString("You won! Scores: "+ score, 260, 300);
-        else g.drawString("Game Over! Scores: "+ score, 190, 300);
-        g.setFont(new Font("serif", Font.BOLD, 20));
-        g.drawString("Press Enter to restart", 230, 350);
+        g.setFont(new Font("abduction2002", Font.PLAIN, 60));
+        g.drawString("GAME OVER!", 170, 160);
+        if(isWon){
+            g.setFont(new Font("abduction2002", Font.PLAIN, 28));
+            g.drawString("I'm sorry.. You failed!", 165, 200);
+        }
+        else{
+            g.setFont(new Font("abduction2002", Font.PLAIN, 40));
+            g.drawString("Congratulations!", 165, 200);
+        }
+        g.setColor(Color.white);
+        g.setFont(new Font("abduction2002", Font.PLAIN, 28));
+        g.drawString("Best time: 03:23", 220, 270);
+        g.setFont(new Font("abduction2002", Font.PLAIN, 20));
+        g.drawString("Your time: 03:23", 250, 310);
+        g.setFont(new Font("abduction2002", Font.PLAIN, 14));
+        g.drawString("Press ESC to QUIT", 110, 380);
+        g.setFont(new Font("abduction2002", Font.PLAIN, 14));
+        g.drawString("Press ENTER to PLAY", 420, 380);
         missiles.clear();
     }
 
@@ -165,7 +195,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     }
     @Override
     public void keyPressed(KeyEvent e) {
-
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             if (!play && !onMenu) {
                 for (int i = 0; i < enemies.map.length; i++) {
@@ -176,7 +205,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 play = true;
                 player.isAlive = true;
                 player.posX = 310;
-                score = 0;
+                timeSeconds = 0;
                 enemies = new MapGenerator(row, col, this.screenWidth, this.screenHeight);
                 totalEnemies = enemies.map.length * enemies.map[0].length;
                 player = new Player(screenWidth / 2 - 25, 500, 50, 20, 20, 5);
@@ -187,6 +216,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             System.exit(0);
+        }
+        if (e.getKeyCode() == KeyEvent.VK_E) {
+            totalEnemies = 0;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_Q) {
+            player.isAlive = false;
         }
         if(!onMenu) {
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
