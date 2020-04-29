@@ -26,7 +26,6 @@ public class Player extends Spaceship {
 
     @Override
     void paint(Graphics2D g) {
-
         if(this.isAlive){
             g.drawImage(playerImg, posX, posY, null);
             //g.setColor(Color.white);

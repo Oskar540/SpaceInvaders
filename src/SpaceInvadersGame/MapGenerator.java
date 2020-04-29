@@ -63,6 +63,7 @@ public class MapGenerator {
     private void enemiesMovement(){
         this.parentPosX += this.globalMovementSpeed;
         if((this.parentPosX <= 10) && (this.globalMovementSpeed < 0)){
+            this.parentPoxY += map[0][0].height + gap;
             this.globalMovementSpeed *= -1;
         }
         if(this.parentPosX + this.enemyWidth*this.map[0].length + this.gap*(this.map[0].length - 1) + 30>= screenWidth && (this.globalMovementSpeed > 0)){
