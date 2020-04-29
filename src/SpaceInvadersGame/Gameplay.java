@@ -35,6 +35,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public Gameplay(int width, int height){
         stars = new Rectangle[20];
         floatingStars();
+        //floatingTime();
         new Thread(()->{while(onMenu){
             menuFrames = menuFrames > 2 ? 1 : menuFrames + 1;
             try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
@@ -42,9 +43,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         try {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("abduction2002.ttf")));
-        } catch (IOException|FontFormatException e) {
-            System.out.println("Cant make new font :(");
-        }
+        } catch (IOException|FontFormatException e) { }
         enemies = new MapGenerator(5, 11, width, height);
         row = enemies.map.length;
         col = enemies.map[0].length;
@@ -75,8 +74,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
             //scores / hp
             g.setColor(Color.white);
-            g.setFont(new Font("serif", Font.BOLD, 25));
-            g.drawString("Health points: " + player.hp, 490, 30);
+            g.setFont(new Font("abduction2002", Font.PLAIN, 25));
+            g.drawString("Health points: " + player.hp, 420, 35);
+            g.drawString("Time: " + ((timeMinutes < 10) ? "0" + timeMinutes : timeMinutes) + ":" +
+                    ((timeSeconds < 10) ? "0" + timeSeconds : timeSeconds), 30, 35);
 
             //missiles
             missiles.forEach((m) -> {
@@ -164,7 +165,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         g.setColor(Color.red);
         g.setFont(new Font("abduction2002", Font.PLAIN, 60));
         g.drawString("GAME OVER!", 170, 160);
-        if(isWon){
+        if(!isWon){
             g.setFont(new Font("abduction2002", Font.PLAIN, 28));
             g.drawString("I'm sorry.. You failed!", 165, 200);
         }
@@ -174,9 +175,11 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         }
         g.setColor(Color.white);
         g.setFont(new Font("abduction2002", Font.PLAIN, 28));
-        g.drawString("Best time: 03:23", 220, 270);
+        g.drawString("Best time: " + ((timeMinutes < 10) ? "0" + timeMinutes : timeMinutes) + ":" +
+                ((timeSeconds < 10) ? "0" + timeSeconds : timeSeconds), 220, 270);
         g.setFont(new Font("abduction2002", Font.PLAIN, 20));
-        g.drawString("Your time: 03:23", 250, 310);
+        g.drawString("Your time: " + ((timeMinutes < 10) ? "0" + timeMinutes : timeMinutes) + ":" +
+                ((timeSeconds < 10) ? "0" + timeSeconds : timeSeconds), 250, 310);
         g.setFont(new Font("abduction2002", Font.PLAIN, 14));
         g.drawString("Press ESC to QUIT", 110, 380);
         g.setFont(new Font("abduction2002", Font.PLAIN, 14));
@@ -225,6 +228,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         }
         if(!onMenu) {
             if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                if(!play) floatingTime();
                 if (player.posX <= 10) {
                     player.posX = 10;
                 } else {
@@ -232,6 +236,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 }
             }
             if(e.getKeyCode() == KeyEvent.VK_RIGHT){
+                if(!play) floatingTime();
                 if(player.posX >= screenWidth - player.width - 20){
                     player.posX = screenWidth - player.width - 20;
                 }
@@ -264,6 +269,21 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 //                    stars[i].getY() = stars[i].getY() + 1;
 //                }
 //            }
+        }).start();
+    }
+    private void floatingTime(){
+        new Thread(()-> {
+            try {Thread.sleep(100);} catch (InterruptedException ex) {System.out.println("Nie spij");}
+            System.out.println(play);
+            while(play){
+                try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+                if(timeSeconds >= 59){
+                    timeMinutes++;
+                    timeSeconds = 0;
+                }
+                else timeSeconds++;
+
+            }
         }).start();
     }
 
