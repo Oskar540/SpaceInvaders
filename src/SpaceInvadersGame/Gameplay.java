@@ -20,8 +20,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public int menuFrames = 1;
     private int timeMinutes = 0;
     private int timeSeconds = 0;
-    private String bestMinutes;
-    private int bestSeconds;
+    private int bestMinutes = 0;
+    private int bestSeconds = 0;
     private int row;
     private int col;
 
@@ -62,9 +62,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         timer.start();
         player = new Player(width/2 - 25, 500, 50, 20, 20, 5);
         missiles = new ArrayList<>();
-        //Scanner sc = new Scanner(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\highscore.txt"));
-        //bestMinutes = sc.next();
-        //System.out.println(bestMinutes);
+
     }
     public void paint(Graphics g){
         //background
@@ -178,11 +176,21 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         else{
             g.setFont(new Font("abduction2002", Font.PLAIN, 40));
             g.drawString("Congratulations!", 165, 200);
+            if(timeMinutes < bestMinutes || (timeMinutes == bestMinutes && timeSeconds < bestSeconds)){
+                bestMinutes = timeMinutes;
+                bestSeconds = timeSeconds;
+                PrintWriter zapis = null;
+                try {zapis = new PrintWriter("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\highscore.txt");}
+                catch (FileNotFoundException e) {e.printStackTrace();}
+                zapis.println(timeMinutes);
+                zapis.println(timeSeconds);
+                zapis.close();
+            }
         }
         g.setColor(Color.white);
         g.setFont(new Font("abduction2002", Font.PLAIN, 28));
-        g.drawString("Best time: " + ((timeMinutes < 10) ? "0" + timeMinutes : timeMinutes) + ":" +
-                ((timeSeconds < 10) ? "0" + timeSeconds : timeSeconds), 220, 270);
+        g.drawString("Best time: " + ((bestMinutes < 10) ? "0" + bestMinutes : bestSeconds) + ":" +
+                ((bestSeconds < 10) ? "0" + bestSeconds : bestSeconds), 220, 270);
         g.setFont(new Font("abduction2002", Font.PLAIN, 20));
         g.drawString("Your time: " + ((timeMinutes < 10) ? "0" + timeMinutes : timeMinutes) + ":" +
                 ((timeSeconds < 10) ? "0" + timeSeconds : timeSeconds), 250, 310);
@@ -219,6 +227,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 totalEnemies = enemies.map.length * enemies.map[0].length;
                 player = new Player(screenWidth / 2 - 25, 500, 50, 20, 20, 5);
                 enemies.enemiesBehaviour();
+                Scanner sc = null;
+                try {
+                    sc = new Scanner(new File("C:\\Users\\oskar\\Documents\\PJATK dev\\SpaceInvadersGame\\src\\SpaceInvadersGame\\highscore.txt"));
+                    bestMinutes = Integer.parseInt(sc.nextLine());
+                    bestSeconds = Integer.parseInt(sc.nextLine());
+                } catch (FileNotFoundException ex) {ex.printStackTrace();}
                 repaint();
             }
             onMenu = false;
@@ -282,16 +296,17 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     }
     private void floatingTime(){
         new Thread(()-> {
+            boolean delayed = false;
             try {Thread.sleep(100);} catch (InterruptedException ex) {System.out.println("Nie spij");}
-            //System.out.println(play);
             while(play){
-                try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+                if(!delayed) try {Thread.sleep(900);} catch (InterruptedException e) {e.printStackTrace();}
+                delayed = true;
                 if(timeSeconds >= 59){
                     timeMinutes++;
                     timeSeconds = 0;
                 }
                 else timeSeconds++;
-
+                try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
             }
         }).start();
     }
