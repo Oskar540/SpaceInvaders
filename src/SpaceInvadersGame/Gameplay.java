@@ -39,7 +39,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public int screenHeight;
 
     public Gameplay(int width, int height){
-        stars = new Rectangle[20];
+        stars = new Rectangle[10];
         new Thread(()->{while(onMenu){
             menuFrames = menuFrames > 2 ? 1 : menuFrames + 1;
             try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
