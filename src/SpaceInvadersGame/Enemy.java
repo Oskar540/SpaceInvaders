@@ -43,4 +43,5 @@ public class Enemy extends Spaceship {
     void paint(Graphics2D g, Color color) {
         g.drawImage(enemyImgRed, posX, posY, null);
     }
+
 }
